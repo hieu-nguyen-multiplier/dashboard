@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Audit Logs - Dashboard</title>
+    <title>Audit Logs</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@mui/material@5.0.0/dist/material.min.css">
     <style>
         body {
@@ -44,6 +44,14 @@
         .filters {
             margin-bottom: 20px;
         }
+
+        .chart {
+            margin-top: 30px;
+        }
+
+        .aggregation {
+            margin-top: 30px;
+        }
     </style>
 </head>
 
@@ -59,9 +67,42 @@
     </div>
 
     <div id="content">
-        <h1>Audit Log Dashboard</h1>
+        <h3>Audit Logs</h3>
 
-        <h3>Audit Logs Table</h3>
+        <!-- Filters Section -->
+        <div class="filters">
+            <label for="action-filter">Action:</label>
+            <select id="action-filter">
+                <option value="all">All</option>
+                <option value="Create">Create</option>
+                <option value="Update">Update</option>
+                <option value="GetById">GetById</option>
+                <option value="GetAll">GetAll</option>
+            </select>
+
+            <label for="role-filter">Role:</label>
+            <select id="role-filter">
+                <option value="all">All</option>
+                <option value="EPD">EPD</option>
+                <option value="Engineering Manager">Engineering Manager</option>
+                <option value="Byte Busters Squad Engineer">Byte Busters Squad Engineer</option>
+                <option value="Code Crusaders Squad Engineer">Code Crusaders Squad Engineer</option>
+                <option value="Tech Support">Tech Support</option>
+            </select>
+
+            <label for="resource-filter">Resource:</label>
+            <select id="resource-filter">
+                <option value="all">All</option>
+                <option value="DatabaseUpdate">DatabaseUpdate</option>
+                <option value="ReadDb">ReadDb</option>
+                <option value="DbPII">DbPII</option>
+                <option value="ServiceCatalog">ServiceCatalog</option>
+                <option value="ServiceCentralConfig">ServiceCentralConfig</option>
+                <option value="Job">Job</option>
+            </select>
+        </div>
+
+        <!-- Audit Logs Table -->
         <table class="table">
             <thead>
                 <tr>
@@ -72,45 +113,182 @@
                     <th>Timestamp</th>
                 </tr>
             </thead>
-            <tbody>
-                <tr>
-                    <td>John Doe</td>
-                    <td>Create</td>
-                    <td>EPD</td>
-                    <td>DatabaseUpdate</td>
-                    <td>2023-03-01 10:30:00 GMT+7</td>
-                </tr>
-                <tr>
-                    <td>Jane Smith</td>
-                    <td>Update</td>
-                    <td>Engineering Manager</td>
-                    <td>ReadDb</td>
-                    <td>2023-03-02 14:45:00 GMT+7</td>
-                </tr>
-                <tr>
-                    <td>Mike Johnson</td>
-                    <td>GetById</td>
-                    <td>Byte Busters Squad Engineer</td>
-                    <td>DbPII</td>
-                    <td>2023-03-03 08:20:00 GMT+7</td>
-                </tr>
-                <tr>
-                    <td>Alice Williams</td>
-                    <td>GetAll</td>
-                    <td>Tech Support</td>
-                    <td>ServiceCatalog</td>
-                    <td>2023-03-04 09:15:00 GMT+7</td>
-                </tr>
-                <tr>
-                    <td>David Brown</td>
-                    <td>Update</td>
-                    <td>Code Crusaders Squad Engineer</td>
-                    <td>ServiceCentralConfig</td>
-                    <td>2023-03-05 11:00:00 GMT+7</td>
-                </tr>
+            <tbody id="log-table-body">
+                <!-- Rows will be dynamically populated -->
             </tbody>
         </table>
+
+        <!-- Data Aggregation -->
+        <div class="aggregation">
+            <h3>Data Aggregation</h3>
+            <p><strong>Most Accessed Resource:</strong> <span id="most-accessed-resource">ServiceCatalog</span></p>
+            <p><strong>Most Common Action:</strong> <span id="most-common-action">Update</span></p>
+        </div>
+
+        <!-- Actions Performed Over Time Chart -->
+        <div class="chart">
+            <h3>Actions Performed Over Time</h3>
+            <canvas id="actionChart"></canvas>
+        </div>
+
     </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // Example data for logs with updated timestamps
+        const logData = [
+            { user: 'John Doe', action: 'Create', role: 'EPD', resource: 'DatabaseUpdate', timestamp: '2023-03-01 10:30:00 GMT+7' },
+            { user: 'Jane Smith', action: 'Update', role: 'Engineering Manager', resource: 'ReadDb', timestamp: '2023-03-01 14:30:00 GMT+7' },
+            { user: 'David Brown', action: 'Update', role: 'Code Crusaders Squad Engineer', resource: 'Job', timestamp: '2023-03-01 16:00:00 GMT+7' },
+            { user: 'Mike Johnson', action: 'GetById', role: 'Byte Busters Squad Engineer', resource: 'DbPII', timestamp: '2023-03-02 08:20:00 GMT+7' },
+            { user: 'Alice Williams', action: 'GetAll', role: 'Tech Support', resource: 'ServiceCatalog', timestamp: '2023-03-03 09:15:00 GMT+7' },
+            { user: 'David Brown', action: 'Update', role: 'Code Crusaders Squad Engineer', resource: 'ServiceCentralConfig', timestamp: '2023-03-03 12:00:00 GMT+7' },
+            { user: 'Emily Davis', action: 'Create', role: 'EPD', resource: 'Job', timestamp: '2023-03-04 10:30:00 GMT+7' }
+        ];
+
+
+        // Function to populate table rows dynamically
+        function populateTable(data) {
+            const tableBody = document.getElementById('log-table-body');
+            tableBody.innerHTML = ''; // Clear previous rows
+
+            data.forEach(log => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${log.user}</td>
+                    <td>${log.action}</td>
+                    <td>${log.role}</td>
+                    <td>${log.resource}</td>
+                    <td>${log.timestamp}</td>
+                `;
+                tableBody.appendChild(row);
+            });
+        }
+
+        // Function to update data aggregation
+        function updateAggregation(data) {
+            const mostAccessedResource = data.reduce((acc, log) => {
+                acc[log.resource] = (acc[log.resource] || 0) + 1;
+                return acc;
+            }, {});
+            const mostCommonAction = data.reduce((acc, log) => {
+                acc[log.action] = (acc[log.action] || 0) + 1;
+                return acc;
+            }, {});
+
+            const maxResource = Object.entries(mostAccessedResource).reduce((max, current) => current[1] > max[1] ? current : max);
+            const maxAction = Object.entries(mostCommonAction).reduce((max, current) => current[1] > max[1] ? current : max);
+
+            document.getElementById('most-accessed-resource').innerText = maxResource[0];
+            document.getElementById('most-common-action').innerText = maxAction[0];
+        }
+
+        // Function to filter data
+        function filterData() {
+            const actionFilter = document.getElementById('action-filter').value;
+            const roleFilter = document.getElementById('role-filter').value;
+            const resourceFilter = document.getElementById('resource-filter').value;
+
+            let filteredData = logData;
+
+            if (actionFilter !== 'all') {
+                filteredData = filteredData.filter(log => log.action === actionFilter);
+            }
+
+            if (roleFilter !== 'all') {
+                filteredData = filteredData.filter(log => log.role === roleFilter);
+            }
+
+            if (resourceFilter !== 'all') {
+                filteredData = filteredData.filter(log => log.resource === resourceFilter);
+            }
+
+            populateTable(filteredData);
+            updateAggregation(filteredData);
+
+            updateChart(filteredData);
+        }
+
+        // Initialize the page
+        function init() {
+            // Initial population of the table
+            populateTable(logData);
+            updateAggregation(logData);
+
+            // Initialize chart
+            updateChart(logData);
+
+            // Add event listeners for filters
+            document.getElementById('action-filter').addEventListener('change', filterData);
+            document.getElementById('role-filter').addEventListener('change', filterData);
+            document.getElementById('resource-filter').addEventListener('change', filterData);
+        }
+
+        // Chart for Actions Performed Over Time
+        function updateChart(data) {
+            const actionCounts = data.reduce((acc, log) => {
+                const date = new Date(log.timestamp).toISOString().split('T')[0]; // Get date part of timestamp
+                if (!acc[date]) acc[date] = { Create: 0, Update: 0, GetById: 0, GetAll: 0 };
+                acc[date][log.action]++;
+                return acc;
+            }, {});
+
+            const chartLabels = Object.keys(actionCounts);
+            const createData = chartLabels.map(date => actionCounts[date].Create);
+            const updateData = chartLabels.map(date => actionCounts[date].Update);
+            const getByIdData = chartLabels.map(date => actionCounts[date].GetById);
+            const getAllData = chartLabels.map(date => actionCounts[date].GetAll);
+
+            const ctx = document.getElementById('actionChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: chartLabels,
+                    datasets: [
+                        {
+                            label: 'Create',
+                            data: createData,
+                            backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                            borderColor: 'rgba(75, 192, 192, 1)',
+                            borderWidth: 1
+                        },
+                        {
+                            label: 'Update',
+                            data: updateData,
+                            backgroundColor: 'rgba(153, 102, 255, 0.2)',
+                            borderColor: 'rgba(153, 102, 255, 1)',
+                            borderWidth: 1
+                        },
+                        {
+                            label: 'GetById',
+                            data: getByIdData,
+                            backgroundColor: 'rgba(255, 159, 64, 0.2)',
+                            borderColor: 'rgba(255, 159, 64, 1)',
+                            borderWidth: 1
+                        },
+                        {
+                            label: 'GetAll',
+                            data: getAllData,
+                            backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                            borderColor: 'rgba(255, 99, 132, 1)',
+                            borderWidth: 1
+                        }
+                    ]
+                },
+                options: {
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        }
+
+        // Call the init function to start
+        init();
+
+    </script>
 
 </body>
 
