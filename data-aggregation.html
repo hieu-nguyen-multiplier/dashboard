@@ -37,15 +37,15 @@
             border: 1px solid #ddd;
         }
 
-        .filters {
-            margin-bottom: 20px;
-        }
-
-        .chart {
-            margin-top: 30px;
+        .active {
+            background-color: #ddd;
         }
 
         .aggregation {
+            margin-top: 30px;
+        }
+
+        .chart {
             margin-top: 30px;
         }
     </style>
@@ -57,19 +57,18 @@
         <h3>Sidebar</h3>
         <ul>
             <li><a href="audit-logs.html">Audit Logs</a></li>
-            <li><a href="data-aggregation.html" class="active">Data Aggregation</a></li> 
+            <li><a href="data-aggregation.html" class="active">Data Aggregation</a></li>
             <li><a href="user-activity.html">User Activity</a></li>
             <li><a href="alerts.html">Alerts</a></li>
         </ul>
     </div>
 
     <div id="content">
-        <h3>Data Aggregation</h3>
+        <h1>Data Aggregation</h1>
 
-        <!-- Data Aggregation -->
+        <!-- Most Accessed Resource per User -->
         <div class="aggregation">
-            <h3>User Access and Resource Aggregation</h3>
-            <p><strong>Most Accessed Resource per User</strong></p>
+            <h3>Most Accessed Resource per User</h3>
             <table class="table">
                 <thead>
                     <tr>
@@ -82,11 +81,34 @@
                     <!-- Aggregated data will be dynamically populated -->
                 </tbody>
             </table>
+
+            <!-- Chart: Most Accessed Resource per User -->
+            <div class="chart">
+                <h3>Most Accessed Resource per User</h3>
+                <canvas id="resourceChart"></canvas>
+            </div>
         </div>
 
-        <!-- Actions Performed Over Time Chart -->
+        <!-- Most Done Action per User -->
+        <div class="aggregation">
+            <h3>Most Done Action per User</h3>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>User</th>
+                        <th>Action</th>
+                        <th>Action Count</th>
+                    </tr>
+                </thead>
+                <tbody id="action-table-body">
+                    <!-- Action data will be dynamically populated -->
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Chart: Most Done Actions by User -->
         <div class="chart">
-            <h3>Actions Performed Over Time</h3>
+            <h3>Most Done Actions by User</h3>
             <canvas id="actionChart"></canvas>
         </div>
     </div>
@@ -101,7 +123,8 @@
             { user: 'Mike Johnson', action: 'GetById', role: 'Byte Busters Squad Engineer', resource: 'DbPII', timestamp: '2023-03-02 08:20:00 GMT+7' },
             { user: 'Alice Williams', action: 'GetAll', role: 'Tech Support', resource: 'ServiceCatalog', timestamp: '2023-03-03 09:15:00 GMT+7' },
             { user: 'David Brown', action: 'Update', role: 'Code Crusaders Squad Engineer', resource: 'ServiceCentralConfig', timestamp: '2023-03-03 12:00:00 GMT+7' },
-            { user: 'Emily Davis', action: 'Create', role: 'EPD', resource: 'Job', timestamp: '2023-03-04 10:30:00 GMT+7' }
+            { user: 'Emily Davis', action: 'Create', role: 'EPD', resource: 'Job', timestamp: '2023-03-04 10:30:00 GMT+7' },
+            { user: 'John Doe', action: 'Update', role: 'EPD', resource: 'DatabaseUpdate', timestamp: '2023-03-01 10:35:00 GMT+7' },
         ];
 
         // Function to aggregate actions per user-resource pair
@@ -119,8 +142,28 @@
             return Object.values(aggregation);
         }
 
-        // Function to populate aggregation table
-        function populateAggregationTable(aggregatedData) {
+        // Function to aggregate resources by user and count the accesses
+        function aggregateResourcesByUser(data) {
+            const aggregation = {};
+
+            data.forEach(log => {
+                // Key based on user and resource (we no longer care about the action)
+                const key = `${log.user}-${log.resource}`;
+                
+                // Initialize the aggregation for this user-resource pair if it doesn't exist
+                if (!aggregation[key]) {
+                    aggregation[key] = { user: log.user, resource: log.resource, count: 0 };
+                }
+                
+                // Increment the count of accesses for this user-resource pair
+                aggregation[key].count++;
+            });
+
+            return Object.values(aggregation); // Return aggregated results as an array
+        }
+
+        // Function to populate the "Most Accessed Resource per User" table
+        function populateResourceTable(aggregatedData) {
             const tableBody = document.getElementById('aggregation-table-body');
             tableBody.innerHTML = ''; // Clear previous rows
 
@@ -135,20 +178,87 @@
             });
         }
 
-        // Function to update chart based on filtered data
-        function updateChart(data) {
+        // Function to aggregate actions per user
+        function aggregateActionsByUser(data) {
+            const actionCount = {};
+
+            data.forEach(log => {
+                const key = `${log.user}-${log.action}`;
+                if (!actionCount[key]) {
+                    actionCount[key] = { user: log.user, action: log.action, count: 0 };
+                }
+                actionCount[key].count++;
+            });
+
+            return Object.values(actionCount);
+        }
+
+        // Function to populate the "Most Done Action per User" table
+        function populateActionTable(actionData) {
+            const tableBody = document.getElementById('action-table-body');
+            tableBody.innerHTML = ''; // Clear previous rows
+
+            actionData.forEach(entry => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${entry.user}</td>
+                    <td>${entry.action}</td>
+                    <td>${entry.count}</td>
+                `;
+                tableBody.appendChild(row);
+            });
+        }
+
+        // Function to update chart for "Most Accessed Resource per User"
+        function updateResourceChart(data) {
+            const resourceCounts = data.reduce((acc, log) => {
+                const key = `${log.user}-${log.resource}`;
+                if (!acc[key]) acc[key] = 0;
+                acc[key]++;
+                return acc;
+            }, {});
+
+            const chartLabels = Object.keys(resourceCounts);
+            const chartData = chartLabels.map(key => resourceCounts[key]);
+            const chartUsers = chartLabels.map(key => key.split('-')[0]); // Extract the user part from the key
+
+            const ctx = document.getElementById('resourceChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: chartUsers,
+                    datasets: [{
+                        label: 'Resource Access Count',
+                        data: chartData,
+                        backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        }
+
+        // Function to update chart for "Most Done Actions by User"
+        function updateActionChart(data) {
             const actionCounts = data.reduce((acc, log) => {
-                const date = new Date(log.timestamp).toISOString().split('T')[0]; // Get date part of timestamp
-                if (!acc[date]) acc[date] = { Create: 0, Update: 0, GetById: 0, GetAll: 0 };
-                acc[date][log.action]++;
+                const user = log.user;
+                if (!acc[user]) acc[user] = { Create: 0, Update: 0, GetById: 0, GetAll: 0 };
+                acc[user][log.action]++;
                 return acc;
             }, {});
 
             const chartLabels = Object.keys(actionCounts);
-            const createData = chartLabels.map(date => actionCounts[date].Create);
-            const updateData = chartLabels.map(date => actionCounts[date].Update);
-            const getByIdData = chartLabels.map(date => actionCounts[date].GetById);
-            const getAllData = chartLabels.map(date => actionCounts[date].GetAll);
+            const createData = chartLabels.map(user => actionCounts[user].Create);
+            const updateData = chartLabels.map(user => actionCounts[user].Update);
+            const getByIdData = chartLabels.map(user => actionCounts[user].GetById);
+            const getAllData = chartLabels.map(user => actionCounts[user].GetAll);
 
             const ctx = document.getElementById('actionChart').getContext('2d');
             new Chart(ctx, {
@@ -196,14 +306,16 @@
             });
         }
 
-        // Function to initialize the page
+        // Initialize the page
         function init() {
-            // Aggregate data and populate table
-            const aggregatedData = aggregateActions(logData);
-            populateAggregationTable(aggregatedData);
+            const resourceData = aggregateResourcesByUser(logData);
+            console.log(resourceData);
+            populateResourceTable(resourceData);
+            updateResourceChart(logData);
 
-            // Update chart with log data
-            updateChart(logData);
+            const actionData = aggregateActionsByUser(logData);
+            populateActionTable(actionData);
+            updateActionChart(logData);
         }
 
         // Call the init function to start
