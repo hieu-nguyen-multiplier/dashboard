@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Audit Logs</title>
+    <title>Data Aggregation - Dashboard</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@mui/material@5.0.0/dist/material.min.css">
     <style>
         body {
@@ -37,10 +37,6 @@
             border: 1px solid #ddd;
         }
 
-        .active {
-            background-color: #ddd;
-        }
-
         .filters {
             margin-bottom: 20px;
         }
@@ -60,70 +56,32 @@
     <div id="sidebar">
         <h3>Sidebar</h3>
         <ul>
-            <li><a href="audit-logs.html" class="active">Audit Logs</a></li>
-            <li><a href="data-aggregation.html">Data Aggregation</a></li>
+            <li><a href="audit-logs.html">Audit Logs</a></li>
+            <li><a href="data-aggregation.html" class="active">Data Aggregation</a></li> 
             <li><a href="user-activity.html">User Activity</a></li>
             <li><a href="alerts.html">Alerts</a></li>
         </ul>
     </div>
 
     <div id="content">
-        <h3>Audit Logs</h3>
-
-        <!-- Filters Section -->
-        <div class="filters">
-            <label for="action-filter">Action:</label>
-            <select id="action-filter">
-                <option value="all">All</option>
-                <option value="Create">Create</option>
-                <option value="Update">Update</option>
-                <option value="GetById">GetById</option>
-                <option value="GetAll">GetAll</option>
-            </select>
-
-            <label for="role-filter">Role:</label>
-            <select id="role-filter">
-                <option value="all">All</option>
-                <option value="EPD">EPD</option>
-                <option value="Engineering Manager">Engineering Manager</option>
-                <option value="Byte Busters Squad Engineer">Byte Busters Squad Engineer</option>
-                <option value="Code Crusaders Squad Engineer">Code Crusaders Squad Engineer</option>
-                <option value="Tech Support">Tech Support</option>
-            </select>
-
-            <label for="resource-filter">Resource:</label>
-            <select id="resource-filter">
-                <option value="all">All</option>
-                <option value="DatabaseUpdate">DatabaseUpdate</option>
-                <option value="ReadDb">ReadDb</option>
-                <option value="DbPII">DbPII</option>
-                <option value="ServiceCatalog">ServiceCatalog</option>
-                <option value="ServiceCentralConfig">ServiceCentralConfig</option>
-                <option value="Job">Job</option>
-            </select>
-        </div>
-
-        <!-- Audit Logs Table -->
-        <table class="table">
-            <thead>
-                <tr>
-                    <th>User</th>
-                    <th>Action</th>
-                    <th>Role</th>
-                    <th>Resource</th>
-                    <th>Timestamp</th>
-                </tr>
-            </thead>
-            <tbody id="log-table-body">
-                <!-- Rows will be dynamically populated -->
-            </tbody>
-        </table>
+        <h3>Data Aggregation</h3>
 
         <!-- Data Aggregation -->
         <div class="aggregation">
-            <h3>Data Aggregation</h3>
-            <p><strong>Most Accessed Resource:</strong> <span id="most-accessed-resource">ServiceCatalog</span></p>
-            <p><strong>Most Common Action:</strong> <span id="most-common-action">Update</span></p>
+            <h3>User Access and Resource Aggregation</h3>
+            <p><strong>Most Accessed Resource per User</strong></p>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>User</th>
+                        <th>Most Accessed Resource</th>
+                        <th>Action Count</th>
+                    </tr>
+                </thead>
+                <tbody id="aggregation-table-body">
+                    <!-- Aggregated data will be dynamically populated -->
+                </tbody>
+            </table>
         </div>
 
         <!-- Actions Performed Over Time Chart -->
@@ -131,7 +89,6 @@
             <h3>Actions Performed Over Time</h3>
             <canvas id="actionChart"></canvas>
         </div>
-
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -147,85 +104,38 @@
             { user: 'Emily Davis', action: 'Create', role: 'EPD', resource: 'Job', timestamp: '2023-03-04 10:30:00 GMT+7' }
         ];
 
-
-        // Function to populate table rows dynamically
-        function populateTable(data) {
-            const tableBody = document.getElementById('log-table-body');
-            tableBody.innerHTML = ''; // Clear previous rows
+        // Function to aggregate actions per user-resource pair
+        function aggregateActions(data) {
+            const aggregation = {};
 
             data.forEach(log => {
+                const key = `${log.user}-${log.resource}`;
+                if (!aggregation[key]) {
+                    aggregation[key] = { user: log.user, resource: log.resource, count: 0 };
+                }
+                aggregation[key].count++;
+            });
+
+            return Object.values(aggregation);
+        }
+
+        // Function to populate aggregation table
+        function populateAggregationTable(aggregatedData) {
+            const tableBody = document.getElementById('aggregation-table-body');
+            tableBody.innerHTML = ''; // Clear previous rows
+
+            aggregatedData.forEach(entry => {
                 const row = document.createElement('tr');
                 row.innerHTML = `
-                    <td>${log.user}</td>
-                    <td>${log.action}</td>
-                    <td>${log.role}</td>
-                    <td>${log.resource}</td>
-                    <td>${log.timestamp}</td>
+                    <td>${entry.user}</td>
+                    <td>${entry.resource}</td>
+                    <td>${entry.count}</td>
                 `;
                 tableBody.appendChild(row);
             });
         }
 
-        // Function to update data aggregation
-        function updateAggregation(data) {
-            const mostAccessedResource = data.reduce((acc, log) => {
-                acc[log.resource] = (acc[log.resource] || 0) + 1;
-                return acc;
-            }, {});
-            const mostCommonAction = data.reduce((acc, log) => {
-                acc[log.action] = (acc[log.action] || 0) + 1;
-                return acc;
-            }, {});
-
-            const maxResource = Object.entries(mostAccessedResource).reduce((max, current) => current[1] > max[1] ? current : max);
-            const maxAction = Object.entries(mostCommonAction).reduce((max, current) => current[1] > max[1] ? current : max);
-
-            document.getElementById('most-accessed-resource').innerText = maxResource[0];
-            document.getElementById('most-common-action').innerText = maxAction[0];
-        }
-
-        // Function to filter data
-        function filterData() {
-            const actionFilter = document.getElementById('action-filter').value;
-            const roleFilter = document.getElementById('role-filter').value;
-            const resourceFilter = document.getElementById('resource-filter').value;
-
-            let filteredData = logData;
-
-            if (actionFilter !== 'all') {
-                filteredData = filteredData.filter(log => log.action === actionFilter);
-            }
-
-            if (roleFilter !== 'all') {
-                filteredData = filteredData.filter(log => log.role === roleFilter);
-            }
-
-            if (resourceFilter !== 'all') {
-                filteredData = filteredData.filter(log => log.resource === resourceFilter);
-            }
-
-            populateTable(filteredData);
-            updateAggregation(filteredData);
-
-            updateChart(filteredData);
-        }
-
-        // Initialize the page
-        function init() {
-            // Initial population of the table
-            populateTable(logData);
-            updateAggregation(logData);
-
-            // Initialize chart
-            updateChart(logData);
-
-            // Add event listeners for filters
-            document.getElementById('action-filter').addEventListener('change', filterData);
-            document.getElementById('role-filter').addEventListener('change', filterData);
-            document.getElementById('resource-filter').addEventListener('change', filterData);
-        }
-
-        // Chart for Actions Performed Over Time
+        // Function to update chart based on filtered data
         function updateChart(data) {
             const actionCounts = data.reduce((acc, log) => {
                 const date = new Date(log.timestamp).toISOString().split('T')[0]; // Get date part of timestamp
@@ -286,9 +196,18 @@
             });
         }
 
+        // Function to initialize the page
+        function init() {
+            // Aggregate data and populate table
+            const aggregatedData = aggregateActions(logData);
+            populateAggregationTable(aggregatedData);
+
+            // Update chart with log data
+            updateChart(logData);
+        }
+
         // Call the init function to start
         init();
-
     </script>
 
 </body>
