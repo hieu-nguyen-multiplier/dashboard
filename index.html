@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Audit Log Dashboard</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@mui/material@5.0.0/dist/material.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            margin: 0;
+            padding: 0;
+        }
+
+        #sidebar {
+            width: 250px;
+            background-color: #f4f4f4;
+            padding: 20px;
+            height: 100vh;
+        }
+
+        #content {
+            flex-grow: 1;
+            padding: 20px;
+        }
+
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .table th,
+        .table td {
+            padding: 10px;
+            border: 1px solid #ddd;
+        }
+
+        .filters {
+            margin-bottom: 20px;
+        }
+
+        .chart {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="sidebar">
+        <h3>Sidebar</h3>
+        <ul>
+            <li>Audit Logs</li>
+            <li>User Activity</li>
+            <li>Alerts</li>
+        </ul>
+        <h4>Filters</h4>
+        <select>
+            <option>User</option>
+            <option>Action</option>
+            <option>Date</option>
+        </select>
+        <input type="date">
+    </div>
+
+    <div id="content">
+        <h1>Audit Log Dashboard</h1>
+
+        <h3>Audit Logs Table</h3>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>User</th>
+                    <th>Action</th>
+                    <th>Timestamp</th>
+                    <th>Resource</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>John Doe</td>
+                    <td>Access Granted</td>
+                    <td>2023-03-01</td>
+                    <td>Database</td>
+                </tr>
+                <tr>
+                    <td>Jane Smith</td>
+                    <td>Permission Revoked</td>
+                    <td>2023-03-02</td>
+                    <td>Service</td>
+                </tr>
+                <tr>
+                    <td>Emily Brown</td>
+                    <td>Access Denied</td>
+                    <td>2023-03-03</td>
+                    <td>API</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h3>Action Trend</h3>
+        <div class="chart">
+            <!-- Insert a chart here (using Chart.js or any other) -->
+            <canvas id="actionChart"></canvas>
+        </div>
+
+        <h3>Alerts</h3>
+        <div>
+            <p><strong>Failed Login Attempts:</strong> High Alert</p>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        var ctx = document.getElementById('actionChart').getContext('2d');
+        var actionChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['2023-03-01', '2023-03-02', '2023-03-03'],
+                datasets: [{
+                    label: 'Number of Actions',
+                    data: [5, 3, 2],
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    </script>
+
+</body>
+
+</html>
