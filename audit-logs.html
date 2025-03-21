@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Audit Logs - Dashboard</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@mui/material@5.0.0/dist/material.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            margin: 0;
+            padding: 0;
+        }
+
+        #sidebar {
+            width: 250px;
+            background-color: #f4f4f4;
+            padding: 20px;
+            height: 100vh;
+        }
+
+        #content {
+            flex-grow: 1;
+            padding: 20px;
+        }
+
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .table th,
+        .table td {
+            padding: 10px;
+            border: 1px solid #ddd;
+        }
+
+        .active {
+            background-color: #ddd;
+        }
+
+        .filters {
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="sidebar">
+        <h3>Sidebar</h3>
+        <ul>
+            <li><a href="audit-logs.html" class="active">Audit Logs</a></li>
+            <li><a href="user-activity.html">User Activity</a></li>
+            <li><a href="alerts.html">Alerts</a></li>
+        </ul>
+    </div>
+
+    <div id="content">
+        <h1>Audit Log Dashboard</h1>
+
+        <h3>Audit Logs Table</h3>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>User</th>
+                    <th>Action</th>
+                    <th>Role</th>
+                    <th>Resource</th>
+                    <th>Timestamp</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>John Doe</td>
+                    <td>Create</td>
+                    <td>EPD</td>
+                    <td>DatabaseUpdate</td>
+                    <td>2023-03-01 10:30:00 GMT+7</td>
+                </tr>
+                <tr>
+                    <td>Jane Smith</td>
+                    <td>Update</td>
+                    <td>Engineering Manager</td>
+                    <td>ReadDb</td>
+                    <td>2023-03-02 14:45:00 GMT+7</td>
+                </tr>
+                <tr>
+                    <td>Mike Johnson</td>
+                    <td>GetById</td>
+                    <td>Byte Busters Squad Engineer</td>
+                    <td>DbPII</td>
+                    <td>2023-03-03 08:20:00 GMT+7</td>
+                </tr>
+                <tr>
+                    <td>Alice Williams</td>
+                    <td>GetAll</td>
+                    <td>Tech Support</td>
+                    <td>ServiceCatalog</td>
+                    <td>2023-03-04 09:15:00 GMT+7</td>
+                </tr>
+                <tr>
+                    <td>David Brown</td>
+                    <td>Update</td>
+                    <td>Code Crusaders Squad Engineer</td>
+                    <td>ServiceCentralConfig</td>
+                    <td>2023-03-05 11:00:00 GMT+7</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+</body>
+
+</html>

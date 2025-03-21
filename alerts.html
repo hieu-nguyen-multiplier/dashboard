@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alerts - Dashboard</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@mui/material@5.0.0/dist/material.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            margin: 0;
+            padding: 0;
+        }
+
+        #sidebar {
+            width: 250px;
+            background-color: #f4f4f4;
+            padding: 20px;
+            height: 100vh;
+        }
+
+        #content {
+            flex-grow: 1;
+            padding: 20px;
+        }
+
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .table th,
+        .table td {
+            padding: 10px;
+            border: 1px solid #ddd;
+        }
+
+        .active {
+            background-color: #ddd;
+        }
+
+    </style>
+</head>
+
+<body>
+
+    <div id="sidebar">
+        <h3>Sidebar</h3>
+        <ul>
+            <li><a href="audit-logs.html">Audit Logs</a></li>
+            <li><a href="user-activity.html">User Activity</a></li>
+            <li><a href="alerts.html" class="active">Alerts</a></li>
+        </ul>
+    </div>
+
+    <div id="content">
+        <h1>Alerts Dashboard</h1>
+
+        <h3>Alerts Table</h3>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Alert Type</th>
+                    <th>Severity</th>
+                    <th>Timestamp</th>
+                    <th>User</th>
+                    <th>Resource</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Failed Login</td>
+                    <td>High</td>
+                    <td>2023-03-01 10:30:00 GMT+7</td>
+                    <td>John Doe</td>
+                    <td>DatabaseUpdate</td>
+                    <td>Resolved</td>
+                </tr>
+                <tr>
+                    <td>Permission Change</td>
+                    <td>Medium</td>
+                    <td>2023-03-02 14:45:00 GMT+7</td>
+                    <td>Jane Smith</td>
+                    <td>ReadDb</td>
+                    <td>Pending</td>
+                </tr>
+                <tr>
+                    <td>Account Locked</td>
+                    <td>High</td>
+                    <td>2023-03-03 08:20:00 GMT+7</td>
+                    <td>Mike Johnson</td>
+                    <td>DbPII</td>
+                    <td>Resolved</td>
+                </tr>
+                <tr>
+                    <td>Failed Login</td>
+                    <td>Low</td>
+                    <td>2023-03-04 09:15:00 GMT+7</td>
+                    <td>Alice Williams</td>
+                    <td>ServiceCatalog</td>
+                    <td>Pending</td>
+                </tr>
+                <tr>
+                    <td>Permission Change</td>
+                    <td>Medium</td>
+                    <td>2023-03-05 11:00:00 GMT+7</td>
+                    <td>David Brown</td>
+                    <td>ServiceCentralConfig</td>
+                    <td>Pending</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+</body>
+
+</html>
