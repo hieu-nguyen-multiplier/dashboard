@@ -82,6 +82,10 @@
                 </tbody>
             </table>
 
+            <!-- Export Button (does nothing for now) -->
+            <br/>
+            <button class="export-btn" id="export-button-1">Export Results of Most Accessed Resource per User</button>
+
             <!-- Chart: Most Accessed Resource per User -->
             <div class="chart">
                 <h3>Most Accessed Resource per User</h3>
@@ -104,13 +108,18 @@
                     <!-- Action data will be dynamically populated -->
                 </tbody>
             </table>
+
+            <!-- Export Button (does nothing for now) -->
+            <br/>
+            <button class="export-btn" id="export-button-2">Export Results of Most Done Actions by User</button>
+
+            <!-- Chart: Most Done Actions by User -->
+            <div class="chart">
+                <h3>Most Done Actions by User</h3>
+                <canvas id="actionChart"></canvas>
+            </div>
         </div>
 
-        <!-- Chart: Most Done Actions by User -->
-        <div class="chart">
-            <h3>Most Done Actions by User</h3>
-            <canvas id="actionChart"></canvas>
-        </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
