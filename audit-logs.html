@@ -120,13 +120,6 @@
             </tbody>
         </table>
 
-        <!-- Data Aggregation -->
-        <div class="aggregation">
-            <h3>Data Aggregation</h3>
-            <p><strong>Most Accessed Resource:</strong> <span id="most-accessed-resource">ServiceCatalog</span></p>
-            <p><strong>Most Common Action:</strong> <span id="most-common-action">Update</span></p>
-        </div>
-
         <!-- Actions Performed Over Time Chart -->
         <div class="chart">
             <h3>Actions Performed Over Time</h3>
@@ -167,24 +160,6 @@
             });
         }
 
-        // Function to update data aggregation
-        function updateAggregation(data) {
-            const mostAccessedResource = data.reduce((acc, log) => {
-                acc[log.resource] = (acc[log.resource] || 0) + 1;
-                return acc;
-            }, {});
-            const mostCommonAction = data.reduce((acc, log) => {
-                acc[log.action] = (acc[log.action] || 0) + 1;
-                return acc;
-            }, {});
-
-            const maxResource = Object.entries(mostAccessedResource).reduce((max, current) => current[1] > max[1] ? current : max);
-            const maxAction = Object.entries(mostCommonAction).reduce((max, current) => current[1] > max[1] ? current : max);
-
-            document.getElementById('most-accessed-resource').innerText = maxResource[0];
-            document.getElementById('most-common-action').innerText = maxAction[0];
-        }
-
         // Function to filter data
         function filterData() {
             const actionFilter = document.getElementById('action-filter').value;
@@ -206,7 +181,6 @@
             }
 
             populateTable(filteredData);
-            updateAggregation(filteredData);
 
             updateChart(filteredData);
         }
@@ -215,7 +189,6 @@
         function init() {
             // Initial population of the table
             populateTable(logData);
-            updateAggregation(logData);
 
             // Initialize chart
             updateChart(logData);
